@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual Tailwind Form</title>
+
+  <!-- ✅ Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 min-h-screen flex items-center justify-center p-6">
+
+  <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-4 text-center">User Form</h1>
+    <form id="userForm" class="space-y-4">
+      <input class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" type="text" name="firstname" placeholder="First Name" required>
+      <input class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" type="text" name="lastname" placeholder="Last Name" required>
+      <input class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" type="email" name="email" placeholder="Email" required>
+      <input class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" type="text" name="username" placeholder="Username" required>
+      <button type="submit" class="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">Submit</button>
+    </form>
+
+    <div class="mt-6">
+      <h2 class="text-xl font-bold mb-2">Users</h2>
+      <ul id="userList" class="bg-white rounded-lg shadow divide-y divide-gray-200"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom reusable styles using @apply */
+
+body {
+  @apply bg-gray-100 text-gray-900;
+}
+
+.form-container {
+  @apply w-full max-w-md bg-white p-6 rounded-lg shadow-md;
+}
+
+.form-title {
+  @apply text-2xl font-bold mb-4 text-center;
+}
+
+.form-field {
+  @apply w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400;
+}
+
+.form-button {
+  @apply w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600;
+}
+
+.user-list {
+  @apply w-full max-w-md mt-6;
+}
+
+.user-list-title {
+  @apply text-xl font-bold mb-2;
+}
+
+.user-list-item {
+  @apply px-4 py-2 border-b last:border-b-0;
+}
