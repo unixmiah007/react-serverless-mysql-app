@@ -10,10 +10,9 @@ function App() {
     email: "",
     username: "",
   });
-  const [users, setUsers] = useState([]);
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
+  const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
   const usersPerPage = 5;
 
   const fetchUsers = async () => {
@@ -29,7 +28,8 @@ function App() {
     fetchUsers();
   }, []);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const sendEmail = () => {
     const templateParams = {
@@ -40,10 +40,10 @@ function App() {
     };
 
     return emailjs.send(
-      "service_t2yw3kf",
-      "service_t2yw3kf", // Replace with your actual template ID!
+      "service_t2yw3kf",    // your EmailJS service ID
+      "template_5wqogy6",   // your EmailJS template ID
       templateParams,
-      "8GNPEgxB20oSY8Dd_"
+      "8GNPEgxB20oSY8Dd_"   // your EmailJS public key
     );
   };
 
@@ -53,35 +53,43 @@ function App() {
     try {
       await axios.post("http://localhost:5000/users", form);
       await sendEmail();
-      alert("User registered and confirmation email sent!");
 
+      alert("User registered and confirmation email sent!");
       setForm({ firstname: "", lastname: "", email: "", username: "" });
       fetchUsers();
-      setCurrentPage(1); // Reset to first page on new user add
     } catch (error) {
       console.error("Error submitting form or sending email:", error);
       alert("Something went wrong. Check console for details.");
     }
   };
 
-  // Calculate displayed users for current page
-  const indexOfLastUser = currentPage * usersPerPage;
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/users/${id}`);
+      fetchUsers(); // refresh list after deletion
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Failed to delete user.");
+    }
+  };
+
+  // Pagination logic
+  const indexOfLastUser = page * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-
-  // Calculate total pages
   const totalPages = Math.ceil(users.length / usersPerPage);
 
-  // Handlers for pagination buttons
-  const goToNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-  const goToPrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
   };
 
   return (
-    <div style={{ minHeight: "100vh", padding: "2rem" }} className="flex flex-col items-center">
+    <div
+      style={{ minHeight: "100vh", padding: "2rem" }}
+      className="flex flex-col items-center"
+    >
       <div className="form-container">
         <h1 className="form-title">User Form</h1>
         <form onSubmit={handleSubmit}>
@@ -134,25 +142,42 @@ function App() {
         </form>
       </div>
 
-      <div className="user-list" style={{ marginTop: "2rem", width: "100%", maxWidth: "600px" }}>
+      <div className="user-list">
         <h2 className="user-list-title">Users</h2>
         <ul>
           {currentUsers.map((u) => (
             <li key={u.id} className="user-list-item">
-              <span className="font-medium">{u.firstname} {u.lastname}</span>
+              <span className="font-medium">
+                {u.firstname} {u.lastname}
+              </span>
               <span> ({u.username}) - {u.email}</span>
+              <button
+                className="ml-2 text-red-600 hover:underline"
+                onClick={() => handleDelete(u.id)}
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>
 
-        <div className="pagination-controls" style={{ marginTop: "1rem", textAlign: "center" }}>
-          <button onClick={goToPrevPage} disabled={currentPage === 1} style={{ marginRight: "1rem" }}>
-            Prev
+        {/* Pagination Controls */}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
+          >
+            Previous
           </button>
           <span>
-            Page {currentPage} of {totalPages}
+            Page {page} of {totalPages}
           </span>
-          <button onClick={goToNextPage} disabled={currentPage === totalPages} style={{ marginLeft: "1rem" }}>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page === totalPages}
+            className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
+          >
             Next
           </button>
         </div>
