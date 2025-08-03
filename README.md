@@ -1,5 +1,7 @@
 # React + Serverless Node.js + MySQL App
 
+<img width="1920" height="975" alt="image" src="https://github.com/user-attachments/assets/92e06c89-1225-48ad-8d98-03b73ca8a088" />
+
 ## Prerequisites
 - WSL with Ubuntu installed
 - Node.js (v18+ recommended)
