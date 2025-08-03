@@ -13,6 +13,7 @@ function App() {
 
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
+  const [editingUserId, setEditingUserId] = useState(null);
   const usersPerPage = 5;
 
   const fetchUsers = async () => {
@@ -51,11 +52,17 @@ function App() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:5000/users", form);
-      await sendEmail();
+      if (editingUserId) {
+        await axios.put(`http://localhost:5000/users/${editingUserId}`, form);
+        alert("User updated successfully!");
+      } else {
+        await axios.post("http://localhost:5000/users", form);
+        await sendEmail();
+        alert("User registered and confirmation email sent!");
+      }
 
-      alert("User registered and confirmation email sent!");
       setForm({ firstname: "", lastname: "", email: "", username: "" });
+      setEditingUserId(null);
       fetchUsers();
     } catch (error) {
       console.error("Error submitting form or sending email:", error);
@@ -66,14 +73,23 @@ function App() {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/users/${id}`);
-      fetchUsers(); // refresh list after deletion
+      fetchUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
       alert("Failed to delete user.");
     }
   };
 
-  // Pagination logic
+  const handleEdit = (user) => {
+    setForm({
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      username: user.username,
+    });
+    setEditingUserId(user.id);
+  };
+
   const indexOfLastUser = page * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
@@ -91,7 +107,7 @@ function App() {
       className="flex flex-col items-center"
     >
       <div className="form-container">
-        <h1 className="form-title">User Form</h1>
+        <h1 className="form-title">{editingUserId ? "Edit User" : "User Form"}</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <input
@@ -134,10 +150,22 @@ function App() {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group flex gap-2">
             <button type="submit" className="form-button">
-              Submit
+              {editingUserId ? "Update" : "Submit"}
             </button>
+            {editingUserId && (
+              <button
+                type="button"
+                className="form-button bg-gray-400"
+                onClick={() => {
+                  setEditingUserId(null);
+                  setForm({ firstname: "", lastname: "", email: "", username: "" });
+                }}
+              >
+                Cancel
+              </button>
+            )}
           </div>
         </form>
       </div>
@@ -151,6 +179,12 @@ function App() {
                 {u.firstname} {u.lastname}
               </span>
               <span> ({u.username}) - {u.email}</span>
+              <button
+                className="ml-2 text-blue-600 hover:underline"
+                onClick={() => handleEdit(u)}
+              >
+                Edit
+              </button>
               <button
                 className="ml-2 text-red-600 hover:underline"
                 onClick={() => handleDelete(u.id)}

@@ -20,7 +20,7 @@ db.connect((err) => {
   console.log("MySQL connected.");
 });
 
-// GET all users
+// ✅ GET all users
 app.get("/users", (req, res) => {
   db.query("SELECT * FROM users", (err, results) => {
     if (err) return res.status(500).send(err);
@@ -28,7 +28,7 @@ app.get("/users", (req, res) => {
   });
 });
 
-// POST new user
+// ✅ POST new user
 app.post("/users", (req, res) => {
   const { firstname, lastname, email, username } = req.body;
   db.query(
@@ -41,13 +41,28 @@ app.post("/users", (req, res) => {
   );
 });
 
+// ✅ PUT (update) user by ID
+app.put("/users/:id", (req, res) => {
+  const { id } = req.params;
+  const { firstname, lastname, email, username } = req.body;
+  db.query(
+    "UPDATE users SET firstname = ?, lastname = ?, email = ?, username = ? WHERE id = ?",
+    [firstname, lastname, email, username, id],
+    (err, result) => {
+      if (err) return res.status(500).send(err);
+      if (result.affectedRows === 0) return res.status(404).send("User not found.");
+      res.sendStatus(200);
+    }
+  );
+});
+
 // ✅ DELETE user by ID
 app.delete("/users/:id", (req, res) => {
   const { id } = req.params;
   db.query("DELETE FROM users WHERE id = ?", [id], (err, result) => {
     if (err) return res.status(500).send(err);
     if (result.affectedRows === 0) return res.status(404).send("User not found.");
-    res.sendStatus(204); // No Content
+    res.sendStatus(204);
   });
 });
 
